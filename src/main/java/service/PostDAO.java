@@ -106,14 +106,17 @@ public class PostDAO implements IPostDAO {
     @Override
     public boolean updatePost(Post post) throws SQLException {
         boolean rowUpdated;
-        try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement(UPDATE_POSTS_SQL);) {
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(UPDATE_POSTS_SQL);) {
             statement.setString(1, post.getTitle());
             statement.setString(2, post.getContent());
             statement.setString(3, post.getShortdescription());
-            statement.setInt(4, post.getId());
+            statement.setString(4, post.getImg());
+            statement.setInt(5, post.getId());
 
             rowUpdated = statement.executeUpdate() > 0;
         }
         return rowUpdated;
     }
+
 }

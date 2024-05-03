@@ -85,10 +85,10 @@ public class PostServlet extends HttpServlet {
     private void showEditForm(HttpServletRequest req, HttpServletResponse resp)
             throws SQLException, ServletException, IOException {
         int id = Integer.parseInt(req.getParameter("id"));
-        Post existingTour = postDAO.searchPostById(id);
+        Post existingPost = postDAO.searchPostById(id);
         RequestDispatcher dispatcher = req.getRequestDispatcher("view/edit.jsp");
-        req.setAttribute("tour", existingTour);
+        req.setAttribute("post", existingPost);
         dispatcher.forward(req, resp);
-
     }
+
 }
