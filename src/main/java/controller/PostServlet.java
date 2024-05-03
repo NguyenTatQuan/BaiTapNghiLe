@@ -1,9 +1,7 @@
 package controller;
 
-
 import model.Post;
-import service.IPostService;
-import service.PostService;
+import service.PostDAO;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -12,34 +10,32 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
-
 
 @WebServlet(name = "PostServlet", urlPatterns = "/posts")
 public class PostServlet extends HttpServlet {
-
-    private final PostService postService = new IPostService();
+    private static final long serialVersionUID = 1L;
+    private PostDAO postDAO;
+    public void init() {
+        postDAO = new PostDAO();
+    }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String action = req.getParameter("action");
-
         if (action == null) {
             action = "";
         }
 
-        switch (action) {
-            case "create":
-                createPost(req, resp);
-                break;
-            case "edit":
-                updatePost(req, resp);
-                break;
-            case "delete":
-                deletePost(req, resp);
-                break;
-            default:
-                break;
+        try {
+            switch (action) {
+                case "edit":
+                    updatePost(req, resp);
+                    break;
+            }
+        } catch (SQLException ex) {
+            throw new ServletException(ex);
         }
     }
 
@@ -49,175 +45,50 @@ public class PostServlet extends HttpServlet {
         if (action == null) {
             action = "";
         }
-        switch (action) {
-            case "create":
-                showCreateForm(req, resp);
-                break;
-            case "edit":
-                showEditForm(req, resp);
-                break;
-            case "delete":
-                showDeleteForm(req, resp);
-                break;
-            case "view":
-                viewPost(req, resp);
-                break;
-            default:
-                listPosts(req, resp);
-                break;
-        }
-    }
-
-    private void viewPost(HttpServletRequest req, HttpServletResponse resp) {
-        int id = Integer.parseInt(req.getParameter("id"));
-        Post post = this.postService.searchById(id);
-        RequestDispatcher dispatcher;
-
-        if (post == null) {
-            dispatcher = req.getRequestDispatcher("view/error-404.jsp");
-        } else {
-            req.setAttribute("post", post);
-            dispatcher = req.getRequestDispatcher("view/view.jsp");
-        }
 
         try {
-            dispatcher.forward(req, resp);
-        } catch (ServletException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            switch (action) {
+                case "edit":
+                    showEditForm(req, resp);
+                    break;
+                default:
+                    listPost(req, resp);
+                    break;
+            }
+        } catch (SQLException ex) {
+            throw new ServletException(ex);
         }
     }
 
-    private void listPosts(HttpServletRequest req, HttpServletResponse resp) {
-        List<Post> posts = this.postService.showAll();
-        req.setAttribute("posts", posts);
-
-        RequestDispatcher dispatcher;
-        dispatcher = req.getRequestDispatcher("view/list.jsp");
-
-        try {
-            dispatcher.forward(req, resp);
-        } catch (ServletException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private void listPost(HttpServletRequest req, HttpServletResponse resp)
+            throws SQLException, IOException, ServletException {
+        List<Post> listPost = postDAO.showAllPosts();
+        req.setAttribute("listPost", listPost);
+        RequestDispatcher dispatcher = req.getRequestDispatcher("view/list.jsp");
+        dispatcher.forward(req, resp);
     }
 
-    private void createPost(HttpServletRequest req, HttpServletResponse resp) {
-
-        int id = Integer.parseInt(req.getParameter("id"));
-        String title = req.getParameter("title");
-        String content = req.getParameter("content");
-        String shortdestination = req.getParameter("shortdescription");
-        String img = req.getParameter("img");
-
-        Post post = new Post(id, title, content, shortdestination, img);
-        this.postService.saveList(post);
-        RequestDispatcher dispatcher;
-        dispatcher = req.getRequestDispatcher("view/create.jsp");
-        req.setAttribute("message", "New post was created");
-
-        try {
-            dispatcher.forward(req, resp);
-        } catch (ServletException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void showCreateForm(HttpServletRequest req, HttpServletResponse resp) {
-        RequestDispatcher dispatcher = req.getRequestDispatcher("view/create.jsp");
-        try {
-            dispatcher.forward(req, resp);
-        } catch (ServletException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void updatePost(HttpServletRequest req, HttpServletResponse resp) {
+    private void updatePost(HttpServletRequest req, HttpServletResponse resp)
+            throws SQLException, IOException, ServletException {
         int id = Integer.parseInt(req.getParameter("id"));
         String title = req.getParameter("title");
         String content = req.getParameter("content");
         String shortdestination = req.getParameter("shortdestination");
+        String img = req.getParameter("img");
 
-        Post post = this.postService.searchById(id);
-        RequestDispatcher dispatcher;
-        if (post == null) {
-            dispatcher = req.getRequestDispatcher("error.jsp");
-        } else {
-            post.setId(id);
-            post.setTitle(title);
-            post.setContent(content);
-            this.postService.update(id, post);
-            req.setAttribute("post", post);
-            req.setAttribute("message", "Post information was updated");
-            dispatcher = req.getRequestDispatcher("view/edit.jsp");
-        }
-        try {
-            dispatcher.forward(req, resp);
-        } catch (ServletException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Post editPost = new Post(id, title, content, shortdestination, img);
+        postDAO.updatePost(editPost);
+        RequestDispatcher dispatcher = req.getRequestDispatcher("view/edit.jsp");
+        dispatcher.forward(req, resp);
     }
 
-    private void showEditForm(HttpServletRequest req, HttpServletResponse resp) {
+    private void showEditForm(HttpServletRequest req, HttpServletResponse resp)
+            throws SQLException, ServletException, IOException {
         int id = Integer.parseInt(req.getParameter("id"));
-        Post post = this.postService.searchById(id);
-        RequestDispatcher dispatcher;
-        if (post == null) {
-            dispatcher = req.getRequestDispatcher("error.jsp");
-        } else {
-            req.setAttribute("post", post);
-            dispatcher = req.getRequestDispatcher("view/edit.jsp");
-        }
-        try {
-            dispatcher.forward(req, resp);
-        } catch (ServletException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+        Post existingTour = postDAO.searchPostById(id);
+        RequestDispatcher dispatcher = req.getRequestDispatcher("view/edit.jsp");
+        req.setAttribute("tour", existingTour);
+        dispatcher.forward(req, resp);
 
-    private void deletePost(HttpServletRequest req, HttpServletResponse resp) {
-        int id = Integer.parseInt(req.getParameter("id"));
-        Post post = this.postService.searchById(id);
-        RequestDispatcher dispatcher;
-        if (post == null) {
-            dispatcher = req.getRequestDispatcher("error.jsp");
-        } else {
-            this.postService.delete(id);
-            try {
-                resp.sendRedirect("/posts");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void showDeleteForm(HttpServletRequest req, HttpServletResponse resp) {
-        int id = Integer.parseInt(req.getParameter("id"));
-        Post post = this.postService.searchById(id);
-        RequestDispatcher dispatcher;
-        if (post == null) {
-            dispatcher = req.getRequestDispatcher("error.jsp");
-        } else {
-            req.setAttribute("post", post);
-            dispatcher = req.getRequestDispatcher("view/delete.jsp");
-        }
-        try {
-            dispatcher.forward(req, resp);
-        } catch (ServletException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }
