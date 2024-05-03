@@ -54,22 +54,32 @@
 </head>
 <body>
 <div class="container">
-    <h1>Create New Post</h1>
-    <form action="posts" method="post">
+    <h2>Tạo Bài Viết Mới</h2>
+    <form action="/posts" method="post">
         <input type="hidden" name="action" value="create">
-        <label for="title">Title:</label>
-        <input type="text" id="title" name="title">
-        <br>
-        <label for="content">Content:</label>
-        <textarea id="content" name="content"></textarea>
-        <br>
-        <label for="shortdescription">Short Description:</label>
-        <input type="text" id="shortdescription" name="shortdescription">
-        <br>
-        <label for="img">Image URL:</label>
-        <input type="text" id="img" name="img">
-        <br>
-        <input type="submit" value="Create">
+        <div>
+            <label for="id">ID:</label>
+            <input type="number" id="id" name="id" required>
+        </div>
+        <div>
+            <label for="title">Tiêu đề:</label>
+            <input type="text" id="title" name="title" required>
+        </div>
+        <div>
+            <label for="content">Nội dung:</label>
+            <textarea id="content" name="content" required></textarea>
+        </div>
+        <div>
+            <label for="shortdescription">Mô tả ngắn:</label>
+            <input type="text" id="shortdescription" name="shortdescription" required>
+        </div>
+        <div>
+            <label for="img">Đường dẫn hình ảnh:</label>
+            <input type="text" id="img" name="img" required>
+        </div>
+        <div>
+            <button type="submit">Tạo</button>
+        </div>
     </form>
 </div>
 </body>

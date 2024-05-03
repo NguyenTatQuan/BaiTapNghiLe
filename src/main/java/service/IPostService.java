@@ -14,10 +14,10 @@ public class IPostService implements PostService {
 
     static {
         posts = new HashMap<>();
-        posts.put(1, new Post(1, "Game", "Trog chơi hot", "game sắp ra mứt", "img/game.jsp"));
-        posts.put(2, new Post(2, "Lập trình", "Java", "Hot nhất 2024", "img/java.png"));
-        posts.put(3, new Post(3, "Âm nhạc", "Bolero", "Những bài nhạc xưa", "img/nhac.jpg"));
-        posts.put(4, new Post(4, "Hài hước", "Truyện cười", "hahaha", "img/haihuoc.png"));
+        posts.put(1, new Post(1, "Game", "Trog chơi hot", "game sắp ra mứt", "img/game.jpg"));
+        posts.put(2, new Post(2, "Lập trình", "Java", "Hot nhất 2024", "img"));
+        posts.put(3, new Post(3, "Âm nhạc", "Bolero", "Những bài nhạc xưa", "img"));
+        posts.put(4, new Post(4, "Hài hước", "Truyện cười", "hahaha", "img"));
         posts.put(5, new Post(5, "Hành động", "Phim", "Hành động gay cấn", "img/hanhdong.jpg"));
     }
     @Override

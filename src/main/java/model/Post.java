@@ -58,5 +58,14 @@ public class Post {
         this.img = img;
     }
 
-
+    @Override
+    public String toString() {
+        return "Post{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", content='" + content + '\'' +
+                ", shortdescription='" + shortdescription + '\'' +
+                ", img='" + img + '\'' +
+                '}';
+    }
 }
