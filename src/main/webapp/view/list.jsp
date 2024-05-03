@@ -22,7 +22,7 @@
                 <td><c:out value="${post.id}"/></td>
                 <td><c:out value="${post.title}"/></td>
                 <td><c:out value="${post.content}"/></td>
-                <td><c:out value="${post.shortdestination}"/></td>
+                <td><c:out value="${post.shortdescription}"/></td>
                 <td><img src="<c:out value='${post.img}'/>" alt="Post Image" style="width: 100px; height: auto;"/></td>
                 <td>
                     <a href="/posts?action=edit&id=${post.id}">Edit</a>

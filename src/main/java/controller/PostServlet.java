@@ -48,6 +48,12 @@ public class PostServlet extends HttpServlet {
 
         try {
             switch (action) {
+                case "create":
+                    showNewForm(req, resp);
+                    break;
+                case "insert":
+                    insertPost(req, resp);
+                    break;
                 case "edit":
                     showEditForm(req, resp);
                     break;
@@ -89,6 +95,23 @@ public class PostServlet extends HttpServlet {
         RequestDispatcher dispatcher = req.getRequestDispatcher("view/edit.jsp");
         req.setAttribute("post", existingPost);
         dispatcher.forward(req, resp);
+    }
+    private void showNewForm(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        RequestDispatcher dispatcher = req.getRequestDispatcher("view/post_form.jsp");
+        dispatcher.forward(req, resp);
+    }
+    private void insertPost(HttpServletRequest req, HttpServletResponse resp)
+            throws SQLException, IOException, ServletException {
+        int id = Integer.parseInt(req.getParameter("id"));
+        String title = req.getParameter("title");
+        String content = req.getParameter("content");
+        String shortDescription = req.getParameter("shortdescription");
+        String img = req.getParameter("img");
+
+        Post newPost = new Post(id,title, content, shortDescription, img);
+        postDAO.addNewPost(newPost);
+        resp.sendRedirect("list");
     }
 
 }

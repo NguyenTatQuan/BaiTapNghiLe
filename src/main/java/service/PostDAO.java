@@ -14,6 +14,8 @@ public class PostDAO implements IPostDAO {
     private static final String SELECT_ALL_POSTS = "select * from post";
     private static final String UPDATE_POSTS_SQL = "update post set title = ?,content= ?, shortdestination =? where id = ?;";
     private static final String SELECT_POST_BY_ID = "select id,title,content,shortdestination from post where id =?";
+    private static final String INSERT_POSTS_SQL = "INSERT INTO posts (title, content, shortdescription, img) VALUES (?, ?, ?, ?);";
+    private static final String DELETE_POSTS_SQL = "DELETE FROM posts WHERE id = ?;";
 
     public PostDAO(){
 
@@ -45,10 +47,21 @@ public class PostDAO implements IPostDAO {
             }
         }
     }
+
     @Override
     public void addNewPost(Post post) throws SQLException {
-
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(INSERT_POSTS_SQL)) {
+            preparedStatement.setString(1, post.getTitle());
+            preparedStatement.setString(2, post.getContent());
+            preparedStatement.setString(3, post.getShortdescription());
+            preparedStatement.setString(4, post.getImg());
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            printSQLException(e);
+        }
     }
+
 
     @Override
     public Post searchPostById(int id) {
@@ -100,7 +113,13 @@ public class PostDAO implements IPostDAO {
 
     @Override
     public boolean deletePost(int id) throws SQLException {
-        return false;
+        boolean rowDeleted;
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(DELETE_POSTS_SQL);) {
+            statement.setInt(1, id);
+            rowDeleted = statement.executeUpdate() > 0;
+        }
+        return rowDeleted;
     }
 
     @Override
