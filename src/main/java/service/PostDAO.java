@@ -11,7 +11,9 @@ public class PostDAO implements IPostDAO {
     private String jdbcPassword = "Quan123123";
 
     private static final String SELECT_ALL_POSTS = "select * from posts";
+    private static final String INSERT_POST_SQL = "INSERT INTO posts (id, title, content, shortdescription, img) VALUES (?, ?, ?, ?, ?);";
     private static final String UPDATE_POSTS_SQL = "update posts set title = ?, content= ?, shortdescription =?, img =? where id = ?;";
+    private static final String DELETE_POST_SQL = "delete from posts where id = ?;";
     private static final String SELECT_POSTS_BY_ID = "select id,title,content,shortdescription from posts where id =?";
 
     public PostDAO(){
@@ -46,19 +48,20 @@ public class PostDAO implements IPostDAO {
     }
     @Override
     public void addNewPost(Post post) throws SQLException {
-        String INSERT_POST_SQL = "INSERT INTO posts (title, content, shortdescription, img) VALUES (?, ?, ?, ?);";
-        try (Connection connection = getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(INSERT_POST_SQL)) {
-            preparedStatement.setString(1, post.getTitle());
-            preparedStatement.setString(2, post.getContent());
-            preparedStatement.setString(3, post.getShortdescription());
-            preparedStatement.setString(4, post.getImg());
-
+        System.out.println(INSERT_POST_SQL);
+        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(INSERT_POST_SQL)) {
+            preparedStatement.setInt(1, post.getId());
+            preparedStatement.setString(2, post.getTitle());
+            preparedStatement.setString(3, post.getContent());
+            preparedStatement.setString(4, post.getShortdescription());
+            preparedStatement.setString(5, post.getImg());
+            System.out.println(preparedStatement);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             printSQLException(e);
         }
     }
+
 
     @Override
     public Post searchPostById(int id) {
@@ -110,16 +113,12 @@ public class PostDAO implements IPostDAO {
 
     @Override
     public boolean deletePost(int id) throws SQLException {
-        boolean rowDeleted;
-        String DELETE_POST_SQL = "DELETE FROM posts WHERE id = ?;";
-        try (Connection connection = getConnection();
-             PreparedStatement statement = connection.prepareStatement(DELETE_POST_SQL);) {
-            statement.setInt(1, id);
-            rowDeleted = statement.executeUpdate() > 0;
-        }
-        return rowDeleted;
+        boolean rowDelete;
+        PreparedStatement preparedStatement = getConnection().prepareStatement(DELETE_POST_SQL);
+        preparedStatement.setInt(1, id);
+        rowDelete = preparedStatement.executeUpdate() > 0;
+        return rowDelete;
     }
-
     @Override
     public boolean updatePost(Post post) throws SQLException {
         boolean rowUpdated;
