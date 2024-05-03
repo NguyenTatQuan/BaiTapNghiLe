@@ -1,36 +1,22 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="model.Post" %>
 <html>
 <head>
-    <title>Edit Post</title>
+    <title>Chỉnh sửa bài viết</title>
 </head>
 <body>
-<div align="center">
-    <h1>Edit Post</h1>
-    <form action="/posts?action=edit" method="post">
-        <input type="hidden" name="id" value="${post.id}" />
-        <table>
-            <tr>
-                <td>Title:</td>
-                <td><input type="text" name="title" value="${post.title}" /></td>
-            </tr>
-            <tr>
-                <td>Content:</td>
-                <td><textarea name="content">${post.content}</textarea></td>
-            </tr>
-            <tr>
-                <td>Short Destination:</td>
-                <td><input type="text" name="shortdestination" value="${post.shortdestination}" /></td>
-            </tr>
-            <tr>
-                <td>Image:</td>
-                <td><input type="text" name="img" value="${post.img}" /></td>
-            </tr>
-            <tr>
-                <td colspan="2" align="center"><input type="submit" value="Save" /></td>
-            </tr>
-        </table>
-    </form>
-</div>
+<h1>Chỉnh sửa bài viết</h1>
+<%
+    Post post = (Post) request.getAttribute("post");
+%>
+<form action="posts" method="post">
+    <input type="hidden" name="action" value="update"/> <!-- Sửa đây: từ "edit" thành "update" để khớp với case trong Servlet -->
+    <input type="hidden" name="id" value="<%= post.getId() %>"/>
+    Tiêu đề: <input type="text" name="title" value="<%= post.getTitle() %>"/><br/>
+    Nội dung: <textarea name="content"><%= post.getContent() %></textarea><br/>
+    Mô tả ngắn: <input type="text" name="shortdescription" value="<%= post.getShortdescription() %>"/><br/>
+    Hình ảnh: <input type="text" name="img" value="<%= post.getImg() %>"/><br/>
+    <input type="submit" value="Cập nhật"/>
+</form>
 </body>
 </html>

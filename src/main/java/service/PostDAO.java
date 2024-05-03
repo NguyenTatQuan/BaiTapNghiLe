@@ -1,4 +1,3 @@
-
 package service;
 import model.Post;
 
@@ -11,11 +10,9 @@ public class PostDAO implements IPostDAO {
     private String jdbcUsername = "root";
     private String jdbcPassword = "Quan123123";
 
-    private static final String SELECT_ALL_POSTS = "select * from post";
-    private static final String UPDATE_POSTS_SQL = "update post set title = ?,content= ?, shortdestination =? where id = ?;";
-    private static final String SELECT_POST_BY_ID = "select id,title,content,shortdestination from post where id =?";
-    private static final String INSERT_POSTS_SQL = "INSERT INTO posts (title, content, shortdescription, img) VALUES (?, ?, ?, ?);";
-    private static final String DELETE_POSTS_SQL = "DELETE FROM posts WHERE id = ?;";
+    private static final String SELECT_ALL_POSTS = "select * from posts";
+    private static final String UPDATE_POSTS_SQL = "update posts set title = ?, content= ?, shortdescription =?, img =? where id = ?;";
+    private static final String SELECT_POSTS_BY_ID = "select id,title,content,shortdescription from posts where id =?";
 
     public PostDAO(){
 
@@ -47,27 +44,27 @@ public class PostDAO implements IPostDAO {
             }
         }
     }
-
     @Override
     public void addNewPost(Post post) throws SQLException {
+        String INSERT_POST_SQL = "INSERT INTO posts (title, content, shortdescription, img) VALUES (?, ?, ?, ?);";
         try (Connection connection = getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(INSERT_POSTS_SQL)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(INSERT_POST_SQL)) {
             preparedStatement.setString(1, post.getTitle());
             preparedStatement.setString(2, post.getContent());
             preparedStatement.setString(3, post.getShortdescription());
             preparedStatement.setString(4, post.getImg());
+
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             printSQLException(e);
         }
     }
 
-
     @Override
     public Post searchPostById(int id) {
         Post post = null;
         try (Connection connection = getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_POST_BY_ID);) {
+             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_POSTS_BY_ID);) {
             preparedStatement.setInt(1, id);
             System.out.println(preparedStatement);
             ResultSet rs = preparedStatement.executeQuery();
@@ -75,9 +72,9 @@ public class PostDAO implements IPostDAO {
             while (rs.next()) {
                 String title = rs.getString("title");
                 String content = rs.getString("content");
-                String shortdestination = rs.getString("shortdestination");
+                String shortdescription = rs.getString("shortdescription");
                 String img = rs.getString("img");
-                post = new Post(id, title, content, shortdestination, img);
+                post = new Post(id, title, content, shortdescription, img);
             }
         } catch (SQLException e) {
             printSQLException(e);
@@ -98,10 +95,10 @@ public class PostDAO implements IPostDAO {
                 int id = rs.getInt("id");
                 String title = rs.getString("title");
                 String content = rs.getString("content");
-                String shortdestination = rs.getString("shortdestination");
+                String shortdescription = rs.getString("shortdescription");
                 String img = rs.getString("img");
 
-                Post post = new Post(id, title, content, shortdestination, img);
+                Post post = new Post(id, title, content, shortdescription, img);
                 posts.add(post);
             }
         } catch (SQLException sqlException) {
@@ -114,8 +111,9 @@ public class PostDAO implements IPostDAO {
     @Override
     public boolean deletePost(int id) throws SQLException {
         boolean rowDeleted;
+        String DELETE_POST_SQL = "DELETE FROM posts WHERE id = ?;";
         try (Connection connection = getConnection();
-             PreparedStatement statement = connection.prepareStatement(DELETE_POSTS_SQL);) {
+             PreparedStatement statement = connection.prepareStatement(DELETE_POST_SQL);) {
             statement.setInt(1, id);
             rowDeleted = statement.executeUpdate() > 0;
         }
@@ -137,5 +135,4 @@ public class PostDAO implements IPostDAO {
         }
         return rowUpdated;
     }
-
 }

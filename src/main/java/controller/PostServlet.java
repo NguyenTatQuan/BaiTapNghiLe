@@ -30,8 +30,14 @@ public class PostServlet extends HttpServlet {
 
         try {
             switch (action) {
+                case "new":
+                    addPost(req, resp);
+                    break;
                 case "edit":
-                    updatePost(req, resp);
+                    showEditForm(req, resp);
+                    break;
+                case "delete":
+                    deletePost(req, resp);
                     break;
             }
         } catch (SQLException ex) {
@@ -48,14 +54,11 @@ public class PostServlet extends HttpServlet {
 
         try {
             switch (action) {
-                case "create":
-                    showNewForm(req, resp);
-                    break;
-                case "insert":
-                    insertPost(req, resp);
-                    break;
                 case "edit":
                     showEditForm(req, resp);
+                    break;
+                case "delete":
+                    deletePost(req, resp);
                     break;
                 default:
                     listPost(req, resp);
@@ -79,39 +82,38 @@ public class PostServlet extends HttpServlet {
         int id = Integer.parseInt(req.getParameter("id"));
         String title = req.getParameter("title");
         String content = req.getParameter("content");
-        String shortdestination = req.getParameter("shortdestination");
+        String shortdescription = req.getParameter("shortdescription");
         String img = req.getParameter("img");
 
-        Post editPost = new Post(id, title, content, shortdestination, img);
+        Post editPost = new Post(id, title, content, shortdescription, img);
         postDAO.updatePost(editPost);
-        RequestDispatcher dispatcher = req.getRequestDispatcher("view/edit.jsp");
-        dispatcher.forward(req, resp);
+        resp.sendRedirect("posts"); // Redirect to the list of posts
     }
 
     private void showEditForm(HttpServletRequest req, HttpServletResponse resp)
             throws SQLException, ServletException, IOException {
         int id = Integer.parseInt(req.getParameter("id"));
         Post existingPost = postDAO.searchPostById(id);
-        RequestDispatcher dispatcher = req.getRequestDispatcher("view/edit.jsp");
+        RequestDispatcher dispatcher = req.getRequestDispatcher("view/view.jsp");
         req.setAttribute("post", existingPost);
         dispatcher.forward(req, resp);
     }
-    private void showNewForm(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        RequestDispatcher dispatcher = req.getRequestDispatcher("view/post_form.jsp");
-        dispatcher.forward(req, resp);
-    }
-    private void insertPost(HttpServletRequest req, HttpServletResponse resp)
+    private void addPost(HttpServletRequest req, HttpServletResponse resp)
             throws SQLException, IOException, ServletException {
-        int id = Integer.parseInt(req.getParameter("id"));
         String title = req.getParameter("title");
         String content = req.getParameter("content");
-        String shortDescription = req.getParameter("shortdescription");
+        String shortdescription = req.getParameter("shortdescription");
         String img = req.getParameter("img");
 
-        Post newPost = new Post(id,title, content, shortDescription, img);
+        Post newPost = new Post(1, title, content, shortdescription, img);
         postDAO.addNewPost(newPost);
-        resp.sendRedirect("list");
+        resp.sendRedirect("posts");
+    }
+    private void deletePost(HttpServletRequest req, HttpServletResponse resp)
+            throws SQLException, IOException, ServletException {
+        int id = Integer.parseInt(req.getParameter("id"));
+        postDAO.deletePost(id);
+        resp.sendRedirect("posts");
     }
 
 }
